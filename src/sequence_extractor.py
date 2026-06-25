@@ -49,8 +49,9 @@ _AA_STRICT = re.compile(r"\b([ACDEFGHIKLMNPQRSTVWY]{12,150})\b")
 
 # 裸AA提取：上下文必须含序列相关关键词才提取（降低误报）
 _BARE_AA_CTX_KW = re.compile(
-    r"polypeptide|peptide|amino.acid|antibod|VH\b|VL\b|CDR|variable.region|"
-    r"heavy.chain|light.chain|antigen.binding|epitope|protein.sequen|融合蛋白|多肽|氨基酸序列|抗体",
+    r"polypeptide|peptide|amino.acid|protein.sequen|融合蛋白|多肽|氨基酸序列|"
+    r"enzyme|variant|mutant|cutinase|lipase|protease|amylase|cellulase|"
+    r"酶|变体|突变体|序列",
     re.IGNORECASE,
 )
 

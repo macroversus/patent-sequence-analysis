@@ -128,9 +128,7 @@ def build_knowledge_base(
         sequences = []
         for si in seq_infos:
             seq_dict = si.to_dict()
-            # 根据序列 location 和专利 status 判断是否受保护
             seq_dict["protected"] = _is_protected(si.location, status)
-            seq_dict["role"] = _infer_sequence_role(si, target)
             sequences.append(seq_dict)
 
         # 提取突变
@@ -228,76 +226,6 @@ def get_risk_level(location: str, patent_status: str) -> str:
     return "low"
 
 
-# ========== 序列角色推断（简化版） ==========
-
-def _infer_sequence_role(seq_info, target: str) -> str:
-    """
-    根据序列特征和上下文推断序列角色。
-
-    Args:
-        seq_info: SequenceInfo 对象
-        target: 靶点名称
-
-    Returns:
-        角色描述字符串
-    """
-    ctx = (seq_info.context or "").lower()
-    seq = seq_info.sequence
-
-    # 优先使用 ST.26 feature 描述
-    if seq_info.feature_desc:
-        fd = seq_info.feature_desc.lower()
-        if "cdr" in fd:
-            return "CDR序列"
-        if "variable" in fd and "heavy" in fd:
-            return "VH重链可变区"
-        if "variable" in fd and "light" in fd:
-            return "VL轻链可变区"
-        if "signal" in fd or "leader" in fd:
-            return "信号肽"
-        if "linker" in fd:
-            return "Linker连接肽"
-        if "framework" in fd:
-            return "Framework框架区"
-        if "constant" in fd:
-            return "恒定区"
-        return seq_info.feature_desc[:50]
-
-    # 上下文关键词
-    if "cdr3" in ctx or "hcdr3" in ctx:
-        return "CDR3"
-    if "cdr2" in ctx or "hcdr2" in ctx:
-        return "CDR2"
-    if "cdr1" in ctx or "hcdr1" in ctx:
-        return "CDR1"
-    if "cdr" in ctx:
-        return "CDR序列"
-    if "vh" in ctx or "heavy chain" in ctx or "重链" in ctx:
-        return "VH重链可变区"
-    if "vl" in ctx or "light chain" in ctx or "轻链" in ctx:
-        return "VL轻链可变区"
-    if "vhh" in ctx or "nanobody" in ctx or "纳米抗体" in ctx:
-        return "VHH纳米抗体"
-    if "sirna" in ctx or "si rna" in ctx:
-        return "siRNA序列"
-    if "primer" in ctx or "引物" in ctx:
-        return "PCR引物"
-    if "signal" in ctx or "leader" in ctx or "信号肽" in ctx:
-        return "信号肽"
-
-    # 序列特征推断
-    if seq_info.seq_type == "AA":
-        if seq_info.source == "ST.26":
-            return "目标蛋白变体"
-        if len(seq) > 100:
-            return "长蛋白序列"
-        if len(seq) > 40:
-            return "蛋白片段"
-        return "短肽片段"
-    else:
-        return "核苷酸序列"
-
-
 # ========== Agent 查询接口 ==========
 
 def query_protected_sites(
@@ -340,7 +268,6 @@ def query_protected_sites(
                     "sequence": seq.get("sequence"),
                     "source": seq.get("source"),
                     "location": seq.get("location"),
-                    "role": seq.get("role"),
                 })
 
         # 受保护的突变
