@@ -39,7 +39,7 @@ DEFAULT_KB_DIR = Path(__file__).parent.parent / "knowledge_base"
 
 def build_knowledge_base(
     target: str,
-    time_start: str = "1900-01-01",
+    time_start: str = "1950-01-01",
     time_end: str | None = None,
     max_pages: int = 5,
     client: CatalystClient | None = None,

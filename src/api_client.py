@@ -52,7 +52,7 @@ class CatalystClient:
     ):
         self.access_key = key or os.getenv("CATALYST_ACCESS_KEY", "")
         self.access_secret = secret or os.getenv("CATALYST_ACCESS_SECRET", "")
-        self.base_url = base_url or BASE_URL
+        self.base_url = base_url or os.getenv("CATALYST_BASE_URL", BASE_URL)
         self.timeout = timeout
 
         if not self.access_key or not self.access_secret:
@@ -142,7 +142,7 @@ class CatalystClient:
     def search_by_keyword(
         self,
         keyword: str,
-        time_start: str = "1900-01-01",
+        time_start: str = "1950-01-01",
         time_end: str | None = None,
         max_pages: int = 5,
         page_size: int = 100,
@@ -204,8 +204,10 @@ class CatalystClient:
                 break  # 已是最后一页
             time.sleep(0.5)
 
-        # 如果累计是 100 的整数倍，可能存在更多数据，尝试时间分片
-        if len(all_items) > 0 and len(all_items) % 100 == 0 and max_pages >= 5:
+        # 如果拿到了 ≥100 条数据，可能存在更多数据被 API 截断，尝试时间分片
+        # 注意：API 的 pageNum 参数不起作用，所有页返回的都是第 1 页数据
+        # 因此只要结果 ≥100 条，就说明可能有遗漏，需要时间分片来突破限制
+        if len(all_items) >= 100 and max_pages >= 5:
             print(f"      [WARNING] Detected possible data truncation, starting time-slicing query...")
 
             start_dt = datetime.strptime(time_start, "%Y-%m-%d")
@@ -293,7 +295,7 @@ class CatalystClient:
     def search_and_get_details(
         self,
         keyword: str,
-        time_start: str = "1900-01-01",
+        time_start: str = "1950-01-01",
         time_end: str | None = None,
         max_pages: int = 5,
         ipcs: list[str] | None = None,

@@ -134,7 +134,7 @@ def main():
     # build-kb 子命令
     build_parser = subparsers.add_parser("build-kb", help="构建知识库")
     build_parser.add_argument("--target", required=True, help="蛋白关键词（如 EGFR）")
-    build_parser.add_argument("--start", default="1900-01-01", help="时间范围起始")
+    build_parser.add_argument("--start", default="1950-01-01", help="时间范围起始")
     build_parser.add_argument("--end", default=None, help="时间范围结束")
     build_parser.add_argument("--max-pages", type=int, default=5, help="最大分页数")
     build_parser.add_argument("--force", action="store_true", help="强制重建（忽略缓存）")

@@ -43,6 +43,21 @@ others/testing/**/*.json
 .env
 config.ini
 
+# 开发工具配置（不推送）
+.claude/
+.cursor/
+CLAUDE.md
+
+# 内部开发文档（不推送）
+PLAN.md
+PROGRESS_REPORT.md
+
+# 知识库缓存（本地生成，不推送）
+knowledge_base/*.json
+
+# 专利样本（本地测试数据，不推送）
+patent_samples/
+
 # Large files
 others/legacy/outputs.zip
 others/legacy/outputs/pdfs/
