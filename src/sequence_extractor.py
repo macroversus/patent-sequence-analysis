@@ -362,8 +362,8 @@ def extract_sequences_from_patent(record: dict) -> list[SequenceInfo]:
     en_abstract = record.get("enAbstract") or ""
     zh_abstract = record.get("zhAbstract") or ""
 
-    # 1. ST.26 序列表提取（仅在 descriptions 中出现）
-    for seq_info in extract_st26_sequences(desc_text):
+    # 1. ST.26 序列表提取（主要在 descriptions，也扫 claims 以防万一）
+    for seq_info in extract_st26_sequences(desc_text + "\n" + claims_text):
         if seq_info.sequence not in seen_sequences:
             seen_sequences.add(seq_info.sequence)
             # ST.26 序列表也需要判断 location
