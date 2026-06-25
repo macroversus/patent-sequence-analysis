@@ -10,7 +10,18 @@
 
 import argparse
 import json
+import os
 import sys
+from pathlib import Path as _Path
+
+# 自动加载 .env 文件（如果存在）
+_env_file = _Path(__file__).parent / ".env"
+if _env_file.exists():
+    for _line in _env_file.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
 
 from src.kb_builder import build_knowledge_base, query_protected_sites
 from src.risk_screener import screen_risk
